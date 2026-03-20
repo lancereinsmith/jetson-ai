@@ -1,0 +1,55 @@
+# Jetson Nano AI Server Configuration
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  # Number of workers (keep at 1 for Jetson Nano due to RAM)
+  workers: 1
+  # Max upload size in MB
+  max_upload_size: 10
+
+models:
+  # Directory where model weights are stored
+  weights_dir: "models/weights"
+
+  image_classifier:
+    enabled: true
+    # Model: mobilenet_v2 or resnet18
+    model: "mobilenet_v2"
+    # Precision: fp32, fp16
+    precision: "fp16"
+    # Input image size
+    input_size: 224
+
+  object_detector:
+    enabled: true
+    # Model: ssd_mobilenet_v2
+    model: "ssd_mobilenet_v2"
+    precision: "fp16"
+    # Confidence threshold
+    confidence_threshold: 0.5
+    input_size: 300
+
+  text_embedder:
+    enabled: true
+    # Model: all-MiniLM-L6-v2
+    model: "all-MiniLM-L6-v2"
+    # Max sequence length
+    max_length: 256
+
+  text_generator:
+    enabled: false  # Disabled by default (uses significant RAM)
+    # Model: TinyLlama-1.1B-Chat (GGUF Q4_K_M quantized)
+    model: "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf"
+    # Max tokens to generate
+    max_tokens: 256
+    # Context window size
+    context_size: 2048
+    # Number of GPU layers to offload (-1 = all)
+    gpu_layers: -1
+
+memory:
+  # Maximum percentage of system RAM to use for models
+  max_ram_percent: 70
+  # Unload models after this many seconds of inactivity (0 = never)
+  idle_unload_seconds: 300

@@ -1,0 +1,56 @@
+[project]
+name = "jetson-ai"
+version = "0.1.0"
+description = "Jetson Nano AI Server"
+requires-python = ">=3.6"
+dependencies = [
+    # Core server
+    "flask",
+    "flask-cors",
+    "pyyaml",
+    # Image processing
+    "pillow",
+    "numpy",
+    # Text embeddings
+    "sentence-transformers",
+    # Monitoring
+    "psutil",
+]
+
+[dependency-groups]
+dev = [
+    "ruff",
+    "pytest",
+]
+onnx = [
+    "onnxruntime-gpu",
+]
+# Install with: CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python
+llm = [
+    "llama-cpp-python",
+]
+
+# ——— Ruff: lint and format (replaces black, isort, flake8) ———
+[tool.ruff]
+line-length = 100
+target-version = "py37"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# ——— ty: type checking (replaces mypy, pyright) ———
+[tool.ty.environment]
+python-version = "3.6"
+
+[tool.ty.src]
+exclude = ["tests"]
+
+# ——— rumdl: markdown linting (mkdocs flavor) ———
+[tool.rumdl]
+respect-gitignore = true
+disable = ["MD007", "MD013", "MD031", "MD033", "MD036", "MD046"]
+exclude = [".git", ".github", "node_modules", "vendor", "dist", "build", "CHANGELOG.md", "LICENSE.md"]

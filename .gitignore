@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Models (large files)
+models/weights/
+models/*.onnx
+models/*.engine
+models/*.trt
+models/*.bin
+models/*.gguf
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Logs
+logs/
+*.log
+
+# Temp
+tmp/
+temp/
+uploads/
+
+# Claude
+.claude/
+.ruff_cache/
+.rumdl_cache/

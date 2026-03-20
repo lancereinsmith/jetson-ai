@@ -1,0 +1,14 @@
+# Core server
+flask
+flask-cors
+pyyaml
+
+# Image processing
+Pillow
+numpy
+
+# Text embeddings
+sentence-transformers
+
+# Monitoring
+psutil
