@@ -34,7 +34,7 @@ RUN mkdir -p /root/.cache/torch/hub/checkpoints && \
 # Sentence-transformers model → clone from HuggingFace (avoids broken huggingface_hub download on Python 3.6)
 RUN apt-get update && apt-get install -y --no-install-recommends git-lfs && \
     git lfs install && \
-    git clone https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2 \
+    git clone --depth 1 https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2 \
     /root/.cache/torch/sentence_transformers/sentence-transformers_all-MiniLM-L6-v2 && \
     apt-get purge -y git-lfs && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 

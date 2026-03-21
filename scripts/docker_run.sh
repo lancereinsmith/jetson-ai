@@ -40,7 +40,6 @@ docker run -d \
     --name "$CONTAINER_NAME" \
     --runtime nvidia \
     -p 8000:8000 \
-    -v "$(pwd)/models/weights:/app/models/weights" \
     -v "$(pwd)/configs:/app/configs" \
     -e OPENBLAS_CORETYPE=ARMV8 \
     -e CUDA_VISIBLE_DEVICES=0 \
