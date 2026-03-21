@@ -2,6 +2,74 @@
 
 Complete instructions for setting up the Jetson Nano AI Server from a fresh Jetson Nano.
 
+## Option A: Docker Setup (Recommended)
+
+Docker is the easiest way to get running. The base image includes PyTorch, CUDA 10.2, and numpy pre-configured via the [jetson-containers](https://github.com/dusty-nv/jetson-containers/tree/legacy) project. No manual PyTorch wheel installation needed.
+
+### Docker Prerequisites
+
+- Jetson Nano with JetPack 4.6.x
+- Docker and `nvidia-container-runtime` installed (included in JetPack)
+
+### Quick Start
+
+```bash
+# Clone the repo
+git clone <your-repo-url> ~/jetson-ai
+cd ~/jetson-ai
+
+# Build and run (builds the image on first run)
+bash scripts/docker_run.sh
+```
+
+To rebuild after code changes:
+
+```bash
+bash scripts/docker_run.sh --build
+```
+
+### Verify
+
+```bash
+curl http://localhost:8000/health
+# → {"status":"ok"}
+
+curl http://localhost:8000/system/info
+# → CPU, memory, GPU, temperature info
+```
+
+### Managing the Container
+
+```bash
+docker logs -f jetson-ai     # View logs
+docker stop jetson-ai        # Stop
+docker start jetson-ai       # Restart
+docker rm jetson-ai          # Remove (then re-run docker_run.sh)
+```
+
+Model weights are stored in `./models/weights/` (bind-mounted), so they persist across container rebuilds.
+
+### Using docker-compose (Optional)
+
+If you have `docker-compose` installed, you can use it instead:
+
+```bash
+# Install docker-compose if needed
+sudo pip install docker-compose
+
+# Then use it
+docker-compose up -d          # Start
+docker-compose logs -f        # View logs
+docker-compose down           # Stop
+docker-compose up -d --build  # Rebuild
+```
+
+---
+
+## Option B: Native Setup
+
+If you prefer running without Docker, follow the steps below.
+
 ## Prerequisites
 
 ### Hardware
@@ -105,11 +173,12 @@ sudo bash scripts/setup_jetson.sh
 
 This will:
 
-1. Install system dependencies (libopenblas, libjpeg, etc.)
-2. Create a Python virtual environment at `./venv`
-3. Install pip packages from `requirements.txt`
-4. Check if PyTorch is installed
-5. Download ImageNet class labels
+1. Install Python 3.8 from the deadsnakes PPA
+2. Install system dependencies (libopenblas, libjpeg, etc.)
+3. Create a Python 3.8 virtual environment at `./venv`
+4. Install pip packages from `requirements.txt`
+5. Check if PyTorch is installed
+6. Download ImageNet class labels
 
 ### Install PyTorch (if not already installed)
 
@@ -122,13 +191,14 @@ python3 --version
 # Download the correct PyTorch wheel for your JetPack + Python version
 # Visit: https://forums.developer.nvidia.com/t/pytorch-for-jetson/72048
 
-# Example for JetPack 4.6 + Python 3.6:
-wget https://nvidia.box.com/shared/static/p57jwntv436lfrd78inwl7iml6p13fzh.whl -O torch-1.12.0-cp36-cp36m-linux_aarch64.whl
-pip install torch-1.12.0-cp36-cp36m-linux_aarch64.whl
+# Example for JetPack 4.6 + Python 3.8:
+wget https://nvidia.box.com/shared/static/ssf2v7pf5i245fber4hw0a2mkgdrbd4o.whl -O torch-1.13.0a0+d0d6b1f-cp38-cp38-linux_aarch64.whl
+pip install torch-1.13.0a0+d0d6b1f-cp38-cp38-linux_aarch64.whl
 
 # Verify PyTorch + CUDA:
+export OPENBLAS_CORETYPE=ARMV8
 python3 -c "import torch; print(torch.__version__); print(f'CUDA: {torch.cuda.is_available()}')"
-# Expected: 1.12.0 (or similar), CUDA: True
+# Expected: 1.13.0 (or similar), CUDA: True
 ```
 
 ### Install torchvision (from source)
@@ -144,9 +214,10 @@ sudo apt-get install -y libjpeg-dev zlib1g-dev libpython3-dev
 #   PyTorch 1.10 → torchvision 0.11
 #   PyTorch 1.11 → torchvision 0.12
 #   PyTorch 1.12 → torchvision 0.13
-git clone --branch v0.13.0 https://github.com/pytorch/vision torchvision
+#   PyTorch 1.13 → torchvision 0.14
+git clone --branch v0.14.0 https://github.com/pytorch/vision torchvision
 cd torchvision
-export BUILD_VERSION=0.13.0
+export BUILD_VERSION=0.14.0
 python3 setup.py install
 cd ..
 rm -rf torchvision  # Clean up source
@@ -270,16 +341,16 @@ This tests all endpoints and reports latency. See [Models Guide](MODELS.md) for 
 Your Home Network
 ┌─────────────────────────────────────────┐
 │                                         │
-│   ┌──────────┐     ┌──────────────┐    │
-│   │  Phone   │────▶│              │    │
-│   └──────────┘     │  Jetson Nano │    │
-│   ┌──────────┐     │  AI Server   │    │
-│   │  Laptop  │────▶│  :8000       │    │
-│   └──────────┘     │              │    │
-│   ┌──────────┐     └──────────────┘    │
-│   │  Other   │────▶      ▲             │
-│   │  Device  │           │             │
-│   └──────────┘     Router/Switch       │
+│   ┌──────────┐     ┌──────────────┐     │
+│   │  Phone   │────▶│              │     │
+│   └──────────┘     │  Jetson Nano │     │
+│   ┌──────────┐     │  AI Server   │     │
+│   │  Laptop  │────▶│  :8000       │     │
+│   └──────────┘     │              │     │
+│   ┌──────────┐     └──────────────┘     │
+│   │  Other   │────▶      ▲              │
+│   │  Device  │           │              │
+│   └──────────┘     Router/Switch        │
 │                                         │
 └─────────────────────────────────────────┘
 ```

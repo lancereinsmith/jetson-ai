@@ -13,13 +13,25 @@ A local AI inference server that runs on an NVIDIA Jetson Nano (4GB). Exposes a 
 | `POST /text/generate` | TinyLlama 1.1B (Q4) | Generate text with a local LLM |
 | `GET /system/info` | - | GPU/CPU/RAM/temperature monitoring |
 
-## Quick Start
+## Quick Start (Docker)
 
 ```bash
 # On your Jetson Nano:
 git clone <your-repo-url> ~/jetson-ai
 cd ~/jetson-ai
 
+# Build and run
+bash scripts/docker_run.sh
+
+# Verify
+curl http://localhost:8000/health
+```
+
+The Docker image includes PyTorch, CUDA 10.2, and all dependencies pre-configured. See the [Setup Guide](docs/SETUP.md) for details and native (non-Docker) setup instructions.
+
+### Native Setup (Alternative)
+
+```bash
 # Run the setup script (installs dependencies)
 sudo bash scripts/setup_jetson.sh
 
@@ -52,9 +64,10 @@ The Swagger API docs are available at `http://<jetson-ip>:8000/docs`.
 ├── docs/                      # Documentation
 ├── models/weights/            # Model weight files (git-ignored)
 ├── scripts/
-│   ├── setup_jetson.sh        # Full setup script
+│   ├── docker_run.sh          # Build and run with Docker
+│   ├── setup_jetson.sh        # Full native setup script
 │   ├── download_models.sh     # Download optional model weights
-│   ├── start_server.sh        # Start the server
+│   ├── start_server.sh        # Start the server (native)
 │   └── benchmark.py           # Performance benchmarking
 └── src/
     ├── main.py                # Flask application

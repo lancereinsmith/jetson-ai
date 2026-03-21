@@ -2,7 +2,7 @@
 name = "jetson-ai"
 version = "0.1.0"
 description = "Jetson Nano AI Server"
-requires-python = ">=3.6"
+requires-python = ">=3.8"
 dependencies = [
     # Core server
     "flask",
@@ -33,7 +33,7 @@ llm = [
 # ——— Ruff: lint and format (replaces black, isort, flake8) ———
 [tool.ruff]
 line-length = 100
-target-version = "py37"
+target-version = "py38"
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
@@ -44,7 +44,7 @@ indent-style = "space"
 
 # ——— ty: type checking (replaces mypy, pyright) ———
 [tool.ty.environment]
-python-version = "3.6"
+python-version = "3.8"
 
 [tool.ty.src]
 exclude = ["tests"]

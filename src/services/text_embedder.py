@@ -16,7 +16,14 @@ class TextEmbedder:
 
         model_name = self._config.get("model", "all-MiniLM-L6-v2")
         logger.info(f"Loading text embedder: {model_name}")
-        self._model = SentenceTransformer(model_name)
+        # Use local cached path if available (avoids broken huggingface_hub download on Python 3.6)
+        local_path = f"/root/.cache/torch/sentence_transformers/sentence-transformers_{model_name}"
+        import os
+        if os.path.isdir(local_path):
+            logger.info(f"Loading from local cache: {local_path}")
+            self._model = SentenceTransformer(local_path)
+        else:
+            self._model = SentenceTransformer(model_name)
         logger.info("Text embedder loaded")
 
     def unload(self):
@@ -29,7 +36,6 @@ class TextEmbedder:
             texts,
             show_progress_bar=False,
             normalize_embeddings=True,
-            max_length=self._config.get("max_length", 256),
         )
         return [emb.tolist() for emb in embeddings]
 

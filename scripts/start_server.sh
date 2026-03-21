@@ -10,9 +10,12 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
 cd "$PROJECT_DIR"
 
-# Activate venv if it exists and we're not already in one
-if [ -z "${VIRTUAL_ENV:-}" ] && [ -d "venv" ]; then
-    source venv/bin/activate
+# Skip venv activation when running inside Docker
+if [ ! -f "/.dockerenv" ]; then
+    # Activate venv if it exists and we're not already in one
+    if [ -z "${VIRTUAL_ENV:-}" ] && [ -d "venv" ]; then
+        source venv/bin/activate
+    fi
 fi
 
 # Set Jetson-specific environment variables for performance

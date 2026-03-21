@@ -9,6 +9,7 @@ numpy
 
 # Text embeddings
 sentence-transformers
+huggingface-hub<0.24
 
 # Monitoring
 psutil

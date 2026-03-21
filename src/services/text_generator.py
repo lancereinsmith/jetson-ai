@@ -37,12 +37,19 @@ class TextGenerator:
             )
 
         logger.info(f"Loading LLM: {model_file}")
-        self._model = Llama(
-            model_path=model_path,
-            n_ctx=self._config.get("context_size", 2048),
-            n_gpu_layers=self._config.get("gpu_layers", -1),
-            verbose=False,
-        )
+        kwargs = {
+            "model_path": model_path,
+            "n_ctx": self._config.get("context_size", 2048),
+            "verbose": False,
+        }
+        # n_gpu_layers was added in newer llama-cpp-python versions
+        import inspect
+        init_params = inspect.signature(Llama.__init__).parameters
+        if "n_gpu_layers" in init_params:
+            kwargs["n_gpu_layers"] = self._config.get("gpu_layers", -1)
+        else:
+            logger.warning("n_gpu_layers not supported by this llama-cpp-python version, running on CPU")
+        self._model = Llama(**kwargs)
         logger.info("LLM loaded")
 
     def unload(self):

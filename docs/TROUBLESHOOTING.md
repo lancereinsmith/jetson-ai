@@ -1,6 +1,49 @@
 # Troubleshooting
 
-## Setup Issues
+## Docker Issues
+
+### Docker build fails
+
+```bash
+# Verify Docker and nvidia runtime are available
+docker info | grep -i runtime
+
+# If nvidia runtime is missing, install it:
+sudo apt-get install -y nvidia-docker2
+sudo systemctl restart docker
+```
+
+### "could not select device driver" / GPU not accessible in container
+
+Make sure you're using the NVIDIA runtime. The `docker_run.sh` script handles this automatically. If running manually:
+
+```bash
+docker run --runtime nvidia ...
+```
+
+### Container starts but models fail to load
+
+```bash
+# Check container logs
+docker logs -f jetson-ai
+
+# Verify GPU is accessible inside the container
+docker exec jetson-ai python3 -c "import torch; print(torch.cuda.is_available())"
+
+# Check memory inside container
+docker exec jetson-ai python3 -c "import torch; print(f'GPU mem: {torch.cuda.get_device_properties(0).total_mem / 1e9:.1f}GB')"
+```
+
+### Model weights not persisting across rebuilds
+
+Model weights should be stored in the bind-mounted `./models/weights/` directory. If weights disappear:
+
+```bash
+# Check bind mount
+docker exec jetson-ai ls -la /app/models/weights/
+```
+
+## Native Setup Issues
 
 ### "No module named torch" / PyTorch not found
 

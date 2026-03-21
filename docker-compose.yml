@@ -1,0 +1,19 @@
+version: "2.4"
+
+services:
+  jetson-ai:
+    build: .
+    runtime: nvidia
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models/weights:/app/models/weights
+      - ./configs:/app/configs
+      - model-cache:/root/.cache
+    environment:
+      - OPENBLAS_CORETYPE=ARMV8
+      - CUDA_VISIBLE_DEVICES=0
+    restart: unless-stopped
+
+volumes:
+  model-cache:

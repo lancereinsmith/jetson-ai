@@ -32,12 +32,15 @@ REAL_USER="${SUDO_USER:-$USER}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
-echo "[1/5] Updating system packages..."
+echo "[1/6] Updating system packages and installing Python 3.8..."
+apt-get update
+apt-get install -y software-properties-common
+add-apt-repository -y ppa:deadsnakes/ppa
 apt-get update
 apt-get install -y \
-    python3-pip \
-    python3-dev \
-    python3-venv \
+    python3.8 \
+    python3.8-venv \
+    python3.8-dev \
     libopenblas-base \
     libopenmpi-dev \
     libjpeg-dev \
@@ -50,24 +53,23 @@ apt-get install -y \
     wget
 
 echo ""
-echo "[2/5] Setting up Python virtual environment..."
+echo "[2/6] Setting up Python 3.8 virtual environment..."
 cd "$PROJECT_DIR"
-sudo -u "$REAL_USER" python3 -m venv venv --system-site-packages
+sudo -u "$REAL_USER" python3.8 -m venv venv
 source venv/bin/activate
 
 echo ""
-echo "[3/5] Installing Python dependencies..."
+echo "[3/6] Installing Python dependencies..."
 pip install --upgrade pip setuptools wheel
 pip install -r requirements.txt
 
 echo ""
-echo "[4/5] Installing PyTorch for Jetson..."
-# PyTorch wheels for JetPack 4.6.x
-# Check https://forums.developer.nvidia.com/t/pytorch-for-jetson/ for latest
-TORCH_URL="https://nvidia.box.com/shared/static/p57jwntv436lfrd78inwl7iml6p13fzh.whl"
-TORCH_FILE="torch-1.12.0a0+2c916ef.nv22.3-cp36-cp36m-linux_aarch64.whl"
+export OPENBLAS_CORETYPE=ARMV8
 
-# Check Python version to pick correct wheel
+echo "[4/6] Installing PyTorch for Jetson..."
+# PyTorch wheels for JetPack 4.6.x + Python 3.8
+# Check https://forums.developer.nvidia.com/t/pytorch-for-jetson/72048 for latest
+
 PY_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
 echo "Detected Python $PY_VERSION"
 
@@ -80,21 +82,22 @@ else
     echo "PyTorch is NOT installed."
     echo "Due to Jetson's ARM architecture, PyTorch must be installed from NVIDIA's wheels."
     echo ""
-    echo "Please visit: https://forums.developer.nvidia.com/t/pytorch-for-jetson/"
-    echo "Download the wheel matching your JetPack version and Python version ($PY_VERSION)."
+    echo "Please visit: https://forums.developer.nvidia.com/t/pytorch-for-jetson/72048"
+    echo "Download the wheel matching your JetPack version and Python $PY_VERSION."
     echo ""
-    echo "Example (JetPack 4.6, Python 3.6):"
-    echo "  wget \$TORCH_URL -O torch.whl"
-    echo "  pip install torch.whl"
+    echo "Example (JetPack 4.6, Python 3.8):"
+    echo "  wget https://nvidia.box.com/shared/static/ssf2v7pf5i245fber4hw0a2mkgdrbd4o.whl -O torch-1.13.0a0+d0d6b1f-cp38-cp38-linux_aarch64.whl"
+    echo "  source venv/bin/activate"
+    echo "  pip install torch-1.13.0a0+d0d6b1f-cp38-cp38-linux_aarch64.whl"
     echo ""
     echo "Then install torchvision from source:"
-    echo "  git clone --branch v0.13.0 https://github.com/pytorch/vision torchvision"
+    echo "  git clone --branch v0.14.0 https://github.com/pytorch/vision torchvision"
     echo "  cd torchvision && python setup.py install"
     echo ""
 fi
 
 echo ""
-echo "[5/5] Creating directories and downloading labels..."
+echo "[5/6] Creating directories and downloading labels..."
 sudo -u "$REAL_USER" mkdir -p "$PROJECT_DIR/models/weights"
 sudo -u "$REAL_USER" mkdir -p "$PROJECT_DIR/logs"
 

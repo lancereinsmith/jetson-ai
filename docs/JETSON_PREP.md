@@ -364,8 +364,14 @@ Quick summary of what to do next:
 cd ~
 git clone <your-repo-url> jetson-ai
 cd jetson-ai
+
+# Option A: Docker (recommended) — no manual PyTorch install needed
+bash scripts/docker_run.sh
+
+# Option B: Native
 sudo bash scripts/setup_jetson.sh
 # Follow instructions for PyTorch installation
 bash scripts/start_server.sh
-# Open http://<jetson-ip>:8000 in your browser
 ```
+
+Then open `http://<jetson-ip>:8000` in your browser. See the [Setup Guide](SETUP.md) for full details on both options.
