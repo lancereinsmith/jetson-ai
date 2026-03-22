@@ -37,14 +37,15 @@ class TextGenerator:
             )
 
         logger.info(f"Loading LLM: {model_file}")
+        import inspect
+        init_params = inspect.signature(Llama.__init__).parameters
+
         kwargs = {
             "model_path": model_path,
             "n_ctx": self._config.get("context_size", 2048),
-            "verbose": False,
         }
-        # n_gpu_layers was added in newer llama-cpp-python versions
-        import inspect
-        init_params = inspect.signature(Llama.__init__).parameters
+        if "verbose" in init_params:
+            kwargs["verbose"] = False
         if "n_gpu_layers" in init_params:
             kwargs["n_gpu_layers"] = self._config.get("gpu_layers", -1)
         else:

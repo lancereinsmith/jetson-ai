@@ -41,10 +41,16 @@ class TextEmbedder:
 
     def similarity(self, text1: str, text2: str) -> float:
         assert self._model is not None, "Model not loaded — call load() first"
-        embeddings = self._model.encode(
-            [text1, text2],
+        # Encode individually to avoid "Already borrowed" bug in older tokenizers
+        emb1 = self._model.encode(
+            [text1],
             show_progress_bar=False,
             normalize_embeddings=True,
-        )
-        score = float(np.dot(embeddings[0], embeddings[1]))
+        )[0]
+        emb2 = self._model.encode(
+            [text2],
+            show_progress_bar=False,
+            normalize_embeddings=True,
+        )[0]
+        score = float(np.dot(emb1, emb2))
         return round(score, 4)
