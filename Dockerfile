@@ -16,7 +16,8 @@ COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Install llama-cpp-python with CUDA support for text generation
-RUN CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip3 install --no-cache-dir llama-cpp-python
+# v0.1.78+ required for GGUF model format; --ignore-requires-python needed for Python 3.6
+RUN CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip3 install --no-cache-dir llama-cpp-python==0.1.78 --ignore-requires-python
 
 # Pre-download all models at build time with wget (avoids torch/CUDA import
 # issues during build — CUDA libs are only fully available at runtime via
